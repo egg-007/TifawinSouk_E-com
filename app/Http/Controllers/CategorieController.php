@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\categorie;
+use App\Models\Categorie;
 use Illuminate\Http\Request;
-
 
 class CategorieController extends Controller
 {
@@ -13,8 +12,8 @@ class CategorieController extends Controller
      */
     public function index()
     {
-        $categories = categorie::all();
-        return view('categorie.index',compact('categories'));
+        $categories = Categorie::all();
+        return view('categorie.index', compact('categories'));
     }
 
     /**
@@ -32,54 +31,48 @@ class CategorieController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|max:25',
-            'slug' => 'required|string|max:25',
-            'description' => 'required|string|max:255'
+            'slug' => 'required|string|max:25|unique:categories,slug',
+            'description' => 'required|string|max:255',
         ]);
+
         Categorie::create($validated);
 
-        return redirect()->route('categorie.index');
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(categorie $categorie)
-    {
-        // return view('categorie.show', compact('categorie'));
+        return redirect()->route('categories.index');
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(categorie $categorie)
+    public function edit(Categorie $category)
     {
-        return view('categorie.edit', compact('categorie'));
+        return view('categorie.edit', [
+            'categorie' => $category
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, categorie $categorie)
+    public function update(Request $request, Categorie $category)
     {
         $validated = $request->validate([
-        'name' => 'required|max:25',
-            'slug' => 'required|string|max:25',
-            'description' => 'required|string|max:255'
-    ]);
+            'name' => 'required|max:25',
+            'slug' => 'required|string|max:25|unique:categories,slug,' . $category->id,
+            'description' => 'required|string|max:255',
+        ]);
 
-    $validated['completed'] = $request->has('completed');
+        $category->update($validated);
 
-    $categorie->update($validated);
-
-    return redirect()->route('categorie.index');
+        return redirect()->route('categories.index');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(categorie $categorie)
+    public function destroy(Categorie $category)
     {
-        $categorie->delete();
-        return redirect()->route('categorie.index');
+        $category->delete();
+
+        return redirect()->route('categories.index');
     }
 }
