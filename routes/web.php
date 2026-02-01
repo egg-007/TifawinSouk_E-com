@@ -21,4 +21,3 @@ Route::get('/', function () {
 
 Route::resource('admin',AdminController::class);
 Route::resource('categories',CategorieController::class);
-Route::resource('categorie',CategorieController::class);
